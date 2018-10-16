@@ -83,6 +83,7 @@
     dest: "{{ wildfly_home }}"
     owner: "{{wildfly_user}}"
     group: "{{wildfly_group}}"
+    remote_src: yes
     extra_opts: [--strip-components=1]
     creates: "{{ wildfly_home }}/bin/add-user.sh"
 
