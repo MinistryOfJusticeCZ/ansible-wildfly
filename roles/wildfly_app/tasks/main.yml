@@ -83,7 +83,7 @@
     dest: "{{ wildfly_home }}"
     owner: "{{wildfly_user}}"
     group: "{{wildfly_group}}"
-    copy: no
+    extra_opts: [--strip-components=1]
     # creates: "{{ wildfly_home }}/start_camunda.sh"
 
 - name: Create wildfly config
