@@ -84,7 +84,7 @@
     owner: "{{wildfly_user}}"
     group: "{{wildfly_group}}"
     extra_opts: [--strip-components=1]
-    # creates: "{{ wildfly_home }}/start_camunda.sh"
+    creates: "{{ wildfly_home }}/bin/add_user.sh"
 
 - name: Create wildfly config
   template:
