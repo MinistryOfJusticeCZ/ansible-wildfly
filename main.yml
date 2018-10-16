@@ -1,0 +1,6 @@
+- name: Setup wildfly web server
+  hosts: all
+  roles:
+    - oracle-java
+    - wildfly_app
+  environment: "{{proxy_env}}"

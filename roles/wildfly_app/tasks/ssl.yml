@@ -1,0 +1,57 @@
+- name: Install pip package pyopenssl for managing openssl trough python
+  pip:
+    name: pyopenssl
+    state: 'present'
+
+- name: Create directories for nginx certs
+  file:
+    path: '/etc/ssl/certs/nginx'
+    state: directory
+    owner: root
+    group: root
+    mode: 0744
+  when: wildfly__generate_certificate
+
+- name: Create directories for nginx certs
+  file:
+    path: '/etc/ssl/private/nginx'
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  when: wildfly__generate_certificate
+
+- name: Create directories for nginx certs
+  file:
+    path: '/etc/ssl/csr'
+    state: directory
+    owner: root
+    group: root
+    mode: 0744
+  when: wildfly__generate_certificate
+
+# Generate an OpenSSL private key with the default values (4096 bits, RSA)
+- openssl_privatekey:
+    path: /etc/ssl/private/nginx/{{wildfly_app_name}}.key
+  when: wildfly__generate_certificate
+
+- name: Generate an OpenSSL Certificate Signing Request
+  openssl_csr:
+    path: /etc/ssl/csr/{{wildfly_app_name}}.csr
+    privatekey_path: /etc/ssl/private/nginx/{{wildfly_app_name}}.key
+    common_name: '{{ ansible_nodename }}'
+  when: wildfly__generate_certificate
+
+- name: Generate a Self Signed OpenSSL certificate for site
+  openssl_certificate:
+    path: /etc/ssl/certs/nginx/{{wildfly_app_name}}.crt
+    privatekey_path: /etc/ssl/private/nginx/{{wildfly_app_name}}.key
+    csr_path: /etc/ssl/csr/{{wildfly_app_name}}.csr
+    provider: selfsigned
+  when: wildfly__generate_certificate
+
+- name: Verify that an existing certificate is still valid 2 weeks (1209600 seconds) from now
+  openssl_certificate:
+    path: /etc/ssl/certs/nginx/{{wildfly_app_name}}.crt
+    provider: assertonly
+    valid_in: 1209600

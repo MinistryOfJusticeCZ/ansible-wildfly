@@ -1,0 +1,103 @@
+---
+- name: Install nginx
+  package:
+    name: 'nginx'
+    state: 'present'
+
+- name: Create deployers group
+  group:
+    name: deployers
+    state: present
+
+- name: Make sure there is a gitlab_deploy user
+  user:
+    name: gitlab_deploy
+    comment: "Gitlab deploy user"
+    groups: sudo,deployers
+    shell: /bin/bash
+    state: present
+
+- name: Ensure .ssh folder for gitlab_deploy user
+  file:
+    path: '~gitlab_deploy/.ssh'
+    state: directory
+    owner: gitlab_deploy
+    group: gitlab_deploy
+    mode: 0700
+
+- name: Copy public key for deploy user
+  copy:
+    content: '{{gitlab_pub_key}}'
+    dest: ~gitlab_deploy/.ssh/authorized_keys
+    owner: gitlab_deploy
+    group: gitlab_deploy
+    mode: 0644
+
+- name: Copy public key for deploy user
+  copy:
+    content: '{{gitlab_priv_key}}'
+    dest: ~gitlab_deploy/.ssh/id_rsa
+    owner: gitlab_deploy
+    group: gitlab_deploy
+    mode: 0600
+
+- include_tasks: ssl.yml
+  when: wildfly__enable_ssl
+
+- name: Create nginx config file
+  template:
+    src: templates/nginx_site.j2
+    dest: /etc/nginx/sites-available/{{wildfly_app_name}}
+  notify: restart nginx
+
+- name: Disable default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: restart nginx
+
+- name: Enable nginx site
+  file:
+    path: /etc/nginx/sites-enabled/{{wildfly_app_name}}
+    src: /etc/nginx/sites-available/{{wildfly_app_name}}
+    state: link
+  notify: restart nginx
+
+- name: install wildfly
+  unarchive:
+    src: "{{ wildfly_url }}"
+    dest: "{{ wildfly_home }}"
+    owner: "{{wildfly_user}}"
+    group: "{{wildfly_group}}"
+    copy: no
+    # creates: "{{ wildfly_home }}/start_camunda.sh"
+
+- name: Create wildfly config
+  template:
+    src: wildfly_config.j2
+    dest: /etc/default/wildfly
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create wildfly launcher
+  template:
+    src: launch_wildfly.sh.j2
+    dest: '{{wildfly_home}}/bin/launch.sh'
+    owner: "{{wildfly_user}}"
+    group: root
+    mode: 0755
+
+- name: Register application systemd main service
+  template:
+    src: systemd_unit.j2
+    dest: /etc/systemd/system/wildfly.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: reload deamons for systemd and enable application service
+  systemd:
+    daemon_reload: yes
+    name: "wildfly"
+    enabled: yes
