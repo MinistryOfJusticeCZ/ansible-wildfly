@@ -69,6 +69,14 @@
     state: link
   notify: restart nginx
 
+- name: Create directory to install wildfly in
+  file:
+    path: "{{ wildfly_home }}"
+    owner: "{{wildfly_user}}"
+    group: "{{wildfly_group}}"
+    state: directory
+    mode: 0755
+
 - name: install wildfly
   unarchive:
     src: "{{ wildfly_url }}"
