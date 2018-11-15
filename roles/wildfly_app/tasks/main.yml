@@ -103,6 +103,20 @@
     group: root
     mode: 0755
 
+- name: Higher memory limits
+  lineinfile:
+    path: '{{wildfly_home}}/bin/standalone.conf'
+    regexp: '^(.*)Xms(\\d+)m -Xmx(\\d+)(.)(.*)$'
+    line: '\1Xms128m -Xmx1024m\5'
+    backrefs: yes
+
+- name: Higher MetaSpace memory limits
+  lineinfile:
+    path: '{{wildfly_home}}/bin/standalone.conf'
+    regexp: '^(.*)XX:MaxMetaspaceSize=(\\d+)m(.*)$'
+    line: '\1XX:MaxMetaspaceSize=512m\3'
+    backrefs: yes
+
 - name: Register application systemd main service
   template:
     src: systemd_unit.j2
