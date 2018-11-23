@@ -135,5 +135,5 @@
   lineinfile:
     dest: /etc/sudoers
     state: present
-    line: '%{{ wildfly_group }} ALL=(root:root) systemctl wildfly restart'
+    line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl restart wildfly'
     validate: visudo -cf %s
