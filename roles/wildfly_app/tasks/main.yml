@@ -116,3 +116,10 @@
     daemon_reload: yes
     name: "wildfly"
     enabled: yes
+
+- name: Allow sudo restart wildfly for deployers group
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: '%{{ wildfly_group }} ALL=(root:root) systemctl wildfly restart'
+    validate: visudo -cf %s
