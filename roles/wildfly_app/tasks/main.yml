@@ -3,7 +3,7 @@
   package:
     name: '{{ item }}'
     state: present
-  with_items: ['python-pip', 'python-dev']
+  with_items: ['python-pip', 'python-dev', 'ca-certificates-java']
 
 - name: Install nginx
   package:
@@ -68,6 +68,9 @@
     src: /etc/nginx/sites-available/{{wildfly_app_name}}
     state: link
   notify: restart nginx
+
+- name: Update CA certificates to java keystore
+  command: /usr/sbin/update-ca-certificates
 
 - name: Create directory to install wildfly in
   file:
