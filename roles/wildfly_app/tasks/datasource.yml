@@ -33,14 +33,15 @@
             #       - valid-connection-checker:
             #           class-name: org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker
       - drivers:
-          - driver:
-              name: "h2"
-              module: "com.h2database.h2"
-              _:
-                - xa-datasource-class: 'org.h2.jdbcx.JdbcDataSource'
-          - driver:
-              name: "{{ wildfly__datasource.driver_name }}"
-              module: "{{ wildfly__datasource.driver_module }}"
-              _:
-                - driver-class: '{{ wildfly__datasource.driver_class_name }}'
+          _:
+            - driver:
+                name: "h2"
+                module: "com.h2database.h2"
+                _:
+                  - xa-datasource-class: 'org.h2.jdbcx.JdbcDataSource'
+            - driver:
+                name: "{{ wildfly__datasource.driver_name }}"
+                module: "{{ wildfly__datasource.driver_module }}"
+                _:
+                  - driver-class: '{{ wildfly__datasource.driver_class_name }}'
   notify: restart wildfly
