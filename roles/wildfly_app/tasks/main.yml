@@ -133,7 +133,7 @@
     daemon_reload: yes
     name: "wildfly"
     enabled: yes
-    started: yes
+    state: started
 
 - name: Allow sudo restart wildfly for deployers group
   lineinfile:
