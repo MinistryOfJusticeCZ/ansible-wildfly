@@ -4,6 +4,37 @@
     name: lxml
     state: present
 
+- name: create module directory
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ wildfly_home }}/modules/system/layers/base/com'
+    - '{{ wildfly_home }}/modules/system/layers/base/com/microsoft'
+    - '{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver'
+
+- name: check if Module com.postgresql file is created
+  stat:
+    path: '{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver/module.xml'
+  register: sqlServerTest
+
+- name: download postgresql jdbc driver
+  get_url:
+    url: "http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/6.4.0.jre8/mssql-jdbc-6.4.0.jre8.jar"
+    dest: "{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver/mssql-jdbc-6.4.0.jre8.jar"
+    mode: 0644
+    owner: '{{ wildfly_user }}'
+    group: '{{ wildfly_group }}'
+  when: sqlServerTest.stat.exists == False
+
+- name: creating module definition
+  template:
+    src: mssql_module.xml.j2
+    dest: '{{ wildfly_home }}/modules/system/layers/base/org/postgresql/main/module.xml'
+    owner: '{{ wildfly_user }}'
+    group: '{{ wildfly_group }}'
+    mode: 0644
+
 - name: Configure datasource in standalone.xml file
   xml:
     file: "{{wildfly_home}}/standalone/configuration/standalone.xml"
