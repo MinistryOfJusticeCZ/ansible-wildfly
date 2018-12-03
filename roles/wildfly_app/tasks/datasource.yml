@@ -30,7 +30,7 @@
 - name: creating module definition
   template:
     src: mssql_module.xml.j2
-    dest: '{{ wildfly_home }}/modules/system/layers/base/org/postgresql/main/module.xml'
+    dest: '{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver/module.xml'
     owner: '{{ wildfly_user }}'
     group: '{{ wildfly_group }}'
     mode: 0644
