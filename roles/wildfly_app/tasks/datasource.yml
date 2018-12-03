@@ -12,6 +12,21 @@
       ds: 'urn:jboss:domain:datasources:5.0'
     set_children:
       - datasource:
+        jndi-name: "java:jboss/datasources/ExampleDS"
+        pool-name: ExampleDS
+        _:
+          - connection-url: "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
+          - driver: h2
+          - pool:
+              _:
+                - min-pool-size: '10'
+                - max-pool-size: '20'
+                - prefill: 'true'
+          - security:
+              _:
+                - user-name: sa
+                - password: sa
+      - datasource:
           jndi-name: "{{ wildfly__datasource.jndi_name }}"
           pool-name: "{{ wildfly__datasource.pool_name }}"
           _:
