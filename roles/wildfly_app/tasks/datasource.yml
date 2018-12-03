@@ -1,4 +1,9 @@
 ---
+- name: Install pip package for handling xml
+  pip:
+    name: lxml
+    state: present
+
 - name: Configure datasource driver in standalone.xml file
   xml:
     file: "{{wildfly_home}}/standalone/configuration/standalone.xml"
