@@ -16,9 +16,9 @@ wildfly__database_db: "{{ wildfly_app_name }}"
 wildfly__database_username: "{{ wildfly_app_name }}"
 wildfly__database_password: "{{ wildfly_app_name }}"
 wildfly__datasource:
-  connection-url: "jdbc:sqlserver://{{ wildfly__database_server_port }};databaseName={{wildfly__database_db}}"
-  jndi-name: "java:/{{ wildfly_app_name }}"
-  pool-name: "{{ wildfly_app_name }}"
-  driver-name: sqlserver
-  driver-module: com.microsoft
-  driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  connection_url: "jdbc:sqlserver://{{ wildfly__database_server_port }};databaseName={{wildfly__database_db}}"
+  jndi_name: "java:/{{ wildfly_app_name }}"
+  pool_name: "{{ wildfly_app_name }}"
+  driver_name: sqlserver
+  driver_module: com.microsoft
+  driver_class_name: com.microsoft.sqlserver.jdbc.SQLServerDriver
