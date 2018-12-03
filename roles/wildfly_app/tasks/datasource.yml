@@ -1,0 +1,45 @@
+---
+- name: Configure datasource driver in standalone.xml file
+  xml:
+    file: "{{wildfly_home}}/standalone/configuration/standalone.xml"
+    xpath: //ds:subsystem/ds:datasources/ds:drivers
+    namespaces:
+      ds: 'urn:jboss:domain:datasources:5.0'
+    set_children:
+      - driver:
+          name: "h2"
+          module: "com.h2database.h2"
+          _:
+            - xa-datasource-class: 'org.h2.jdbcx.JdbcDataSource'
+      - driver:
+          name: "{{ wildfly__datasource.driver-name }}"
+          module: "{{ wildfly__datasource.driver-module }}"
+          _:
+            - driver-class: '{{ wildfly__datasource.driver-class-name }}'
+  notify: restart wildfly
+
+- name: Configure datasource in standalone.xml file
+  xml:
+    file: "{{wildfly_home}}/standalone/configuration/standalone.xml"
+    xpath: //ds:subsystem/ds:datasources
+    namespaces:
+      ds: 'urn:jboss:domain:datasources:5.0'
+    set_children:
+      - connection-url: "{{ wildfly__datasource.connection-url }}"
+      - driver: "{{ wildfly__datasource.driver-name }}"
+      - pool:
+          _:
+            - max-pool-size: "5"
+            - max-pool-size: "50"
+            # - prefill: "false"
+            - use-strict-min: "false"
+            # - flush-strategy: "FailingConnectionOnly"
+      - security:
+          _:
+            - user-name: "{{ wildfly__database_username }}"
+            - password: "{{ wildfly__database_password }}"
+      # - validation:
+      #     _:
+      #       - valid-connection-checker:
+      #           class-name: org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker
+  notify: restart wildfly

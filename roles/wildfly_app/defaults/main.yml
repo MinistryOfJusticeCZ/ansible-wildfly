@@ -8,3 +8,17 @@ wildfly__reverse_proxy: False
 wildfly__generate_certificate: True #allow to create the certificates
 wildfly__enable_ssl: True
 wildfly__kerberos: False
+
+
+# Defining datasource
+wildfly__database_server_port: localhost:4666
+wildfly__database_db: "{{ wildfly_app_name }}"
+wildfly__database_username: "{{ wildfly_app_name }}"
+wildfly__database_password: "{{ wildfly_app_name }}"
+wildfly__datasource:
+  connection-url: "jdbc:sqlserver://{{ wildfly__database_server_port }};databaseName={{wildfly__database_db}}"
+  jndi-name: "java:/{{ wildfly_app_name }}"
+  pool-name: "{{ wildfly_app_name }}"
+  driver-name: sqlserver
+  driver-module: com.microsoft
+  driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

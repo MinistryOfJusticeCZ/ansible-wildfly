@@ -1,3 +1,6 @@
 ---
 - name: restart nginx
   service: name=nginx state=restarted
+
+- name: restart wildfly
+  service: name=wildfly state=restarted
