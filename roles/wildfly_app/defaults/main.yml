@@ -20,5 +20,9 @@ wildfly__datasource:
   jndi_name: "java:/{{ wildfly_app_name }}"
   pool_name: "{{ wildfly_app_name }}"
   driver_name: sqlserver
-  driver_module: com.microsoft
+  driver_module: com.microsoft.sqlserver
   driver_class_name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+
+# management users
+wildfly_management_users: []

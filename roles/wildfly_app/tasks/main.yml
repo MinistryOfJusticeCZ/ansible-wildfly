@@ -90,6 +90,9 @@
     extra_opts: [--strip-components=1]
     creates: "{{ wildfly_home }}/bin/add-user.sh"
 
+- name: Change ownership of WildFly installation
+  file: path='{{ wildfly_home }}' owner='{{wildfly_user}}' group='{{wildfly_group}}' state=directory recurse=yes
+
 - name: Create wildfly config
   template:
     src: wildfly_config.j2
@@ -142,5 +145,26 @@
     line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl restart wildfly'
     validate: visudo -cf %s
 
+- name: Create management users
+  shell: >
+    {{ wildfly_home }}/bin/add-user.sh -s
+    {{ item.name }} {{ item.password }} && touch {{ wildfly_home }}/.mgmt-users.{{ item.name }}.provisioned
+  with_items: "{{ wildfly_management_users }}"
+  become: True
+  become_user: '{{ wildfly_user }}'
+  args:
+    creates: "{{ wildfly_home }}/.mgmt-users.{{ item.name }}.provisioned"
+  when: wildfly_management_users | length > 0
+  no_log: True
+
+- name: Enforce secure permissions on password files
+  file:
+    path: "{{ wildfly_home }}/standalone/configuration/{{ item }}"
+    owner: "{{ wildfly_user }}"
+    group: "{{ wildfly_group }}"
+    mode: "0600"
+  with_items:
+    - mgmt-groups.properties
+    - mgmt-users.properties
 
 - include_tasks: datasource.yml
