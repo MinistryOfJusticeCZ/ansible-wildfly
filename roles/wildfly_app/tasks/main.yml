@@ -150,12 +150,12 @@
     {{ wildfly_home }}/bin/add-user.sh -s
     {{ item.name }} {{ item.password }} && touch {{ wildfly_home }}/.mgmt-users.{{ item.name }}.provisioned
   with_items: "{{ wildfly_management_users }}"
-  become: True
-  become_user: '{{ wildfly_user }}'
+  # become: True
+  # become_user: '{{ wildfly_user }}'
   args:
     creates: "{{ wildfly_home }}/.mgmt-users.{{ item.name }}.provisioned"
   when: wildfly_management_users | length > 0
-  # no_log: True
+  no_log: True
 
 - name: Enforce secure permissions on password files
   file:
