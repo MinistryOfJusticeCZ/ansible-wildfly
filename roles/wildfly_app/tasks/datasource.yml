@@ -9,9 +9,9 @@
     path: '{{ item }}'
     state: directory
   with_items:
-    - '{{ wildfly_home }}/modules/system/layers/base/com'
-    - '{{ wildfly_home }}/modules/system/layers/base/com/microsoft'
-    - '{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver'
+    - '{{ wildfly__modules_basepath }}/com'
+    - '{{ wildfly__modules_basepath }}/com/microsoft'
+    - '{{ wildfly__modules_basepath }}/com/microsoft/sqlserver'
 
 - name: check if Module com.postgresql file is created
   stat:
@@ -21,7 +21,7 @@
 - name: download postgresql jdbc driver
   get_url:
     url: "http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/6.4.0.jre8/mssql-jdbc-6.4.0.jre8.jar"
-    dest: "{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver/mssql-jdbc-6.4.0.jre8.jar"
+    dest: "{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/mssql-jdbc-6.4.0.jre8.jar"
     mode: 0644
     owner: '{{ wildfly_user }}'
     group: '{{ wildfly_group }}'
@@ -30,7 +30,7 @@
 - name: creating module definition
   template:
     src: mssql_module.xml.j2
-    dest: '{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver/module.xml'
+    dest: '{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/module.xml'
     owner: '{{ wildfly_user }}'
     group: '{{ wildfly_group }}'
     mode: 0644
@@ -58,6 +58,9 @@
                   - user-name: sa
                   - password: sa
       - datasource:
+          jta: "true"
+          enabled: "true"
+          use-ccm: "false"
           jndi-name: "{{ wildfly__datasource.jndi_name }}"
           pool-name: "{{ wildfly__datasource.pool_name }}"
           _:
@@ -65,7 +68,7 @@
             - driver: "{{ wildfly__datasource.driver_name }}"
             - pool:
                 _:
-                  - max-pool-size: "5"
+                  - min-pool-size: "5"
                   - max-pool-size: "50"
                   # - prefill: "false"
                   - use-strict-min: "false"
@@ -74,10 +77,11 @@
                 _:
                   - user-name: "{{ wildfly__database_username }}"
                   - password: "{{ wildfly__database_password }}"
-            # - validation:
-            #     _:
-            #       - valid-connection-checker:
-            #           class-name: org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker
+            - validation:
+                _:
+                  - background-validation: "true"
+                  - valid-connection-checker:
+                      class-name: org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker
       - drivers:
           _:
             - driver:
@@ -90,4 +94,5 @@
                 module: "{{ wildfly__datasource.driver_module }}"
                 _:
                   - driver-class: '{{ wildfly__datasource.driver_class_name }}'
+                  - xa-datasource-class: '{{ wildfly__datasource.xa_datasource_class }}'
   notify: restart wildfly

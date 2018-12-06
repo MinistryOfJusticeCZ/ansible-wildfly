@@ -1,0 +1,2 @@
+---
+wildfly__modules_basepath: "{{ wildfly_home }}/modules/system/layers/base"

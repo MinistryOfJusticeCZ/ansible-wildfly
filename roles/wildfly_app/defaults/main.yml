@@ -22,6 +22,7 @@ wildfly__datasource:
   driver_name: sqlserver
   driver_module: com.microsoft.sqlserver
   driver_class_name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  xa_datasource_class: com.microsoft.sqlserver.jdbc.SQLServerXADataSource
 
 
 # management users
