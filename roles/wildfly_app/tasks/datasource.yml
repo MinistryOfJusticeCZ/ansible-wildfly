@@ -12,16 +12,17 @@
     - '{{ wildfly__modules_basepath }}/com'
     - '{{ wildfly__modules_basepath }}/com/microsoft'
     - '{{ wildfly__modules_basepath }}/com/microsoft/sqlserver'
+    - '{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/main'
 
 - name: check if Module com.postgresql file is created
   stat:
-    path: '{{ wildfly_home }}/modules/system/layers/base/com/microsoft/sqlserver/module.xml'
+    path: '{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/main/module.xml'
   register: sqlServerTest
 
 - name: download postgresql jdbc driver
   get_url:
     url: "http://central.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/6.4.0.jre8/mssql-jdbc-6.4.0.jre8.jar"
-    dest: "{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/mssql-jdbc-6.4.0.jre8.jar"
+    dest: "{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/main/mssql-jdbc-6.4.0.jre8.jar"
     mode: 0644
     owner: '{{ wildfly_user }}'
     group: '{{ wildfly_group }}'
@@ -30,7 +31,7 @@
 - name: creating module definition
   template:
     src: mssql_module.xml.j2
-    dest: '{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/module.xml'
+    dest: '{{ wildfly__modules_basepath }}/com/microsoft/sqlserver/main/module.xml'
     owner: '{{ wildfly_user }}'
     group: '{{ wildfly_group }}'
     mode: 0644
