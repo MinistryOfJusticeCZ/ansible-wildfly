@@ -155,6 +155,20 @@
     line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl restart wildfly'
     validate: visudo -cf %s
 
+- name: Allow sudo start wildfly for deployers group
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl start wildfly'
+    validate: visudo -cf %s
+
+- name: Allow sudo stop wildfly for deployers group
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl stop wildfly'
+    validate: visudo -cf %s
+
 - name: Create management users
   shell: >
     {{ wildfly_home }}/bin/add-user.sh -s
