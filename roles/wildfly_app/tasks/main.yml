@@ -3,7 +3,7 @@
   package:
     name: '{{ item }}'
     state: present
-  with_items: ['python-pip', 'python-dev', 'ca-certificates-java']
+  with_items: ['python-pip', 'python-dev']
 
 - name: Install nginx
   package:
@@ -69,9 +69,6 @@
     state: link
   notify: restart nginx
 
-- name: Update CA certificates to java keystore
-  command: /usr/sbin/update-ca-certificates
-
 - name: Create directory to install wildfly in
   file:
     path: "{{ wildfly_home }}"
@@ -122,6 +119,19 @@
     regexp: '^(.*)XX:MaxMetaspaceSize=(\\d+)m(.*)$'
     line: '\1XX:MaxMetaspaceSize=512m\3'
     backrefs: yes
+
+- name: Install ca-certificates hooks for java
+  package:
+    name: 'ca-certificates-java'
+    state: present
+
+- name: Update CA certificates to java keystore
+  command: /usr/sbin/update-ca-certificates
+
+- name: Use generated system jks keystore insted of default one
+  lineinfile:
+    path: '{{wildfly_home}}/bin/standalone.conf'
+    line: 'JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts"'
 
 - name: Register application systemd main service
   template:
