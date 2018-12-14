@@ -148,26 +148,29 @@
     enabled: yes
     state: started
 
-- name: Allow sudo restart wildfly for deployers group
+- name: Define sudo alias to control wildfly service
   lineinfile:
     dest: /etc/sudoers
     state: present
-    line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl restart wildfly'
+    line: '%Cmnd_Alias WILDFLY_SVC =/bin/systemctl restart wildfly, /bin/systemctl start wildfly,/bin/systemctl stop wildfly, /bin/systemctl status wildfly'
+    insertafter: '^# Cmnd '
     validate: visudo -cf %s
 
-- name: Allow sudo start wildfly for deployers group
+- name: Allow sudo control wildfly for deployers group
   lineinfile:
     dest: /etc/sudoers
     state: present
-    line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl start wildfly'
+    line: '%{{ wildfly_group }} ALL=(root) WILDFLY_SVC'
     validate: visudo -cf %s
 
-- name: Allow sudo stop wildfly for deployers group
+- name: Allow sudo restart wildfly for wildfly_user
   lineinfile:
     dest: /etc/sudoers
     state: present
-    line: '%{{ wildfly_group }} ALL=(root) /usr/bin/systemctl stop wildfly'
+    line: '%{{ wildfly_user }}  ALL=(root) NOPASSWD:/bin/systemctl restart wildfly'
+    insertafter: '^%{{ wildfly_group }} '
     validate: visudo -cf %s
+  when: realmd.sudo_group is defined
 
 - name: Create management users
   shell: >
