@@ -152,7 +152,7 @@
   lineinfile:
     dest: /etc/sudoers
     state: present
-    line: '%Cmnd_Alias WILDFLY_SVC =/bin/systemctl restart wildfly, /bin/systemctl start wildfly,/bin/systemctl stop wildfly, /bin/systemctl status wildfly'
+    line: 'Cmnd_Alias WILDFLY_SVC =/bin/systemctl restart wildfly, /bin/systemctl start wildfly,/bin/systemctl stop wildfly, /bin/systemctl status wildfly'
     insertafter: '^# Cmnd '
     validate: visudo -cf %s
 
@@ -167,7 +167,7 @@
   lineinfile:
     dest: /etc/sudoers
     state: present
-    line: '%{{ wildfly_user }}  ALL=(root) NOPASSWD:/bin/systemctl restart wildfly'
+    line: '{{ wildfly_user }}  ALL=(root) NOPASSWD:/bin/systemctl restart wildfly'
     insertafter: '^%{{ wildfly_group }} '
     validate: visudo -cf %s
   when: realmd.sudo_group is defined
