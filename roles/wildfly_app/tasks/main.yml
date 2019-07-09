@@ -167,7 +167,7 @@
   lineinfile:
     dest: /etc/sudoers
     state: present
-    line: '{{ wildfly_user }}  ALL=(root) NOPASSWD:/bin/systemctl restart wildfly'
+    line: '{{ wildfly_user }}  ALL=(root) NOPASSWD:WILDFLY_SVC'
     insertafter: '^%{{ wildfly_group }} '
     validate: visudo -cf %s
   when: realmd.sudo_group is defined
